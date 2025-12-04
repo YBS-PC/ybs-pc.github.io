@@ -22,6 +22,7 @@
             align-items: center;
             overflow: hidden;
             position: relative;
+            flex-direction: column; /* Чтобы футер был внизу */
         }
 
         /* --- Фоновая анимация (Сферы) --- */
@@ -33,22 +34,8 @@
             animation: float 10s infinite ease-in-out alternate;
         }
 
-        .c1 {
-            width: 400px;
-            height: 400px;
-            background: #ff0076;
-            top: -50px;
-            left: -50px;
-        }
-
-        .c2 {
-            width: 300px;
-            height: 300px;
-            background: #00eaff;
-            bottom: -50px;
-            right: -50px;
-            animation-delay: -5s;
-        }
+        .c1 { width: 400px; height: 400px; background: #ff0076; top: -50px; left: -50px; }
+        .c2 { width: 300px; height: 300px; background: #00eaff; bottom: -50px; right: -50px; animation-delay: -5s; }
 
         @keyframes float {
             0% { transform: translate(0, 0); }
@@ -110,11 +97,6 @@
             box-shadow: 0 0 10px rgba(0, 234, 255, 0.3);
         }
 
-        .input-group input::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-        }
-
-        /* --- Кнопка --- */
         .btn-login {
             width: 100%;
             padding: 15px;
@@ -135,30 +117,7 @@
             box-shadow: 0 10px 20px rgba(0, 234, 255, 0.6);
         }
 
-        .btn-login:active {
-            transform: translateY(0);
-        }
-
-        /* --- Имитация загрузки --- */
-        .loader {
-            display: none;
-            width: 24px;
-            height: 24px;
-            border: 3px solid #fff;
-            border-bottom-color: transparent;
-            border-radius: 50%;
-            display: inline-block;
-            box-sizing: border-box;
-            animation: rotation 1s linear infinite;
-        }
-
-        @keyframes rotation {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .hidden { display: none; }
-        
+        /* --- Ссылки --- */
         .footer-links {
             margin-top: 20px;
             font-size: 0.8rem;
@@ -169,11 +128,103 @@
             text-decoration: none;
             margin: 0 10px;
             transition: 0.3s;
+            cursor: pointer;
         }
         
-        .footer-links a:hover {
-            color: #fff;
+        .footer-links a:hover { color: #fff; }
+
+        /* --- Нижний юридический блок --- */
+        .legal-footer {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 0.7rem;
+            z-index: 5;
+            padding: 0 20px;
+            line-height: 1.5;
         }
+
+        .legal-footer span {
+            display: block;
+            margin-top: 5px;
+        }
+
+        /* --- МОДАЛЬНОЕ ОКНО --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background: rgba(20, 20, 40, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            width: 350px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 234, 255, 0.2);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-title {
+            color: #fff;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .modal-desc {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+        }
+
+        .close-modal {
+            margin-top: 15px;
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,0.3);
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .close-modal:hover { color: #fff; }
+
+        /* --- Лоадер --- */
+        .loader {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #fff;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            animation: rotation 1s linear infinite;
+        }
+        
+        .hidden { display: none; }
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
     </style>
 </head>
@@ -201,12 +252,41 @@
         </form>
 
         <div class="footer-links">
-            <a href="#">Forgot Key?</a>
-            <a href="#">Request Access</a>
+            <a id="forgotLink">Forgot Key?</a>
+            <a id="requestLink">Request Access</a>
+        </div>
+    </div>
+
+    <div class="legal-footer">
+        NEXUS FILE SYSTEMS INC. &copy; 2024. ALL RIGHTS RESERVED. <br>
+        <span>
+            By accessing this gateway, you agree to our Zero-Knowledge Privacy Policy (ZKPP) and End-to-End Encryption Standards (E2EE). 
+            Unauthorized access attempts are logged and reported to international cybersecurity agencies. 
+            GDPR & CCPA Compliant. TLS 1.3 Secure Connection.
+        </span>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <h3 class="modal-title" id="modalTitle">Title</h3>
+            <p class="modal-desc" id="modalDesc">Enter your email to proceed.</p>
+            
+            <form id="modalForm">
+                <div class="input-group">
+                    <input type="email" id="modalEmail" placeholder="Corporate Email Address" required>
+                </div>
+                <button type="submit" class="btn-login" id="modalBtn">
+                    <span id="modalBtnText">Send Request</span>
+                    <span id="modalLoader" class="loader hidden"></span>
+                </button>
+            </form>
+            
+            <button class="close-modal" id="closeModal">Cancel</button>
         </div>
     </div>
 
     <script>
+        // --- Логика основного входа ---
         const form = document.getElementById('loginForm');
         const btn = document.getElementById('submitBtn');
         const btnText = document.getElementById('btnText');
@@ -214,21 +294,17 @@
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-            
-            // Имитация процесса входа
             btnText.classList.add('hidden');
             loader.classList.remove('hidden');
             btn.style.opacity = "0.7";
             
             setTimeout(() => {
-                // Здесь логика после "успешного" ввода
                 btnText.innerText = "Access Denied";
                 btnText.classList.remove('hidden');
                 loader.classList.add('hidden');
                 btn.style.background = "linear-gradient(90deg, #ff0076, #ff4d4d)";
                 btn.style.boxShadow = "0 5px 15px rgba(255, 0, 118, 0.4)";
                 
-                // Сброс через 2 секунды
                 setTimeout(() => {
                     btnText.innerText = "Connect to Server";
                     btn.style.background = "linear-gradient(90deg, #00eaff, #0076ff)";
@@ -238,6 +314,77 @@
                 }, 2000);
             }, 1500);
         });
+
+        // --- Логика Модальных окон ---
+        const modal = document.getElementById('modalOverlay');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDesc = document.getElementById('modalDesc');
+        const modalForm = document.getElementById('modalForm');
+        const modalBtn = document.getElementById('modalBtn');
+        const modalBtnText = document.getElementById('modalBtnText');
+        const modalLoader = document.getElementById('modalLoader');
+        const modalEmail = document.getElementById('modalEmail');
+
+        // Открытие "Forgot Key"
+        document.getElementById('forgotLink').addEventListener('click', () => {
+            modalTitle.innerText = "Encryption Key Recovery";
+            modalDesc.innerText = "Enter your registered ID to receive a one-time decryption token.";
+            modalBtnText.innerText = "Send Token";
+            modal.classList.add('active');
+        });
+
+        // Открытие "Request Access"
+        document.getElementById('requestLink').addEventListener('click', () => {
+            modalTitle.innerText = "Request Invitation";
+            modalDesc.innerText = "This node is private. Enter your email to queue for an invitation slot.";
+            modalBtnText.innerText = "Join Queue";
+            modal.classList.add('active');
+        });
+
+        // Закрытие модального окна
+        const closeModal = () => {
+            modal.classList.remove('active');
+            // Сброс состояния кнопки
+            setTimeout(() => {
+                modalBtnText.innerText = "Send Request";
+                modalBtn.style.background = "linear-gradient(90deg, #00eaff, #0076ff)";
+                modalEmail.value = "";
+                modalBtn.disabled = false;
+            }, 300);
+        };
+
+        document.getElementById('closeModal').addEventListener('click', closeModal);
+
+        // Имитация отправки в модальном окне
+        modalForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            modalBtnText.classList.add('hidden');
+            modalLoader.classList.remove('hidden');
+            modalBtn.style.opacity = "0.7";
+            
+            setTimeout(() => {
+                // Успешная "отправка"
+                modalLoader.classList.add('hidden');
+                modalBtnText.classList.remove('hidden');
+                modalBtnText.innerText = "Link Sent!";
+                modalBtn.style.background = "#00d26a"; // Зеленый цвет успеха
+                modalBtn.style.boxShadow = "0 0 15px rgba(0, 210, 106, 0.5)";
+                modalBtn.disabled = true;
+
+                // Закрытие через 1.5 секунды после успеха
+                setTimeout(() => {
+                    closeModal();
+                }, 1500);
+
+            }, 1200);
+        });
+
+        // Закрытие при клике вне окна
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+
     </script>
 </body>
 </html>
