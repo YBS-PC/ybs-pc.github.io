@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS | Secure Cloud Storage</title>
+    <title>NEXUS DRIVE | The Quantum Data Platform</title>
     <style>
-        /* --- Сброс и Базовые настройки --- */
+        /* --- Reset and Base Styles --- */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -16,7 +16,7 @@
         body {
             background-color: #0f0c29;
             background-image: linear-gradient(315deg, #0f0c29 0%, #302b63 74%, #24243e 100%);
-            /* ИСПРАВЛЕНИЕ ФОНА: Растягиваем и фиксируем */
+            /* BACKGROUND FIX: Stretch and fix */
             min-height: 100vh;
             width: 100%;
             background-repeat: no-repeat;
@@ -29,10 +29,10 @@
             overflow: hidden; 
             position: relative;
             flex-direction: column;
-            padding: 50px 0; /* Отступ сверху/снизу для адаптивности */
+            padding: 50px 0;
         }
 
-        /* --- Фоновая анимация (Сферы) --- */
+        /* --- Background Animation (Circles) --- */
         .circle {
             position: absolute;
             border-radius: 50%;
@@ -49,19 +49,19 @@
             100% { transform: translate(30px, 50px); }
         }
 
-        /* --- БЛОК: Заголовок и Описание Сервиса --- */
+        /* --- Hero Information Block (Marketing Copy) --- */
         .hero-info {
             position: relative;
             z-index: 10;
             text-align: center;
             width: 90%;
             max-width: 700px;
-            margin-bottom: 40px; /* Отступ до формы входа */
+            margin-bottom: 40px; 
             padding: 0 20px;
         }
         
         .hero-title {
-            font-size: clamp(2rem, 5vw, 3.5rem); /* Адаптивный размер */
+            font-size: clamp(2rem, 5vw, 3.5rem); 
             font-weight: 800;
             margin-bottom: 15px;
             line-height: 1.2;
@@ -79,7 +79,7 @@
             margin: 0 auto;
         }
 
-        /* --- Контейнер входа (Стекло) --- */
+        /* --- Login Container (Glassmorphism) --- */
         .login-container {
             position: relative;
             z-index: 10;
@@ -114,7 +114,7 @@
             margin-bottom: 30px;
         }
 
-        /* --- Форма, Кнопки, Ссылки, Лоадер и Футер остаются без изменений --- */
+        /* --- Form, Buttons, Links, Loader, and Footer styles remain consistent --- */
         .input-group { position: relative; margin-bottom: 20px; }
         .input-group input { width: 100%; padding: 15px; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; color: #fff; outline: none; transition: 0.3s; font-size: 1rem; }
         .input-group input:focus { border-color: #00eaff; box-shadow: 0 0 10px rgba(0, 234, 255, 0.3); }
@@ -146,10 +146,10 @@
 
     <div class="hero-info">
         <h1 class="hero-title">
-            NEXUS DRIVE: Революционное Хранилище Квантовых Данных.
+            NEXUS DRIVE: The Revolutionary Quantum Data Platform.
         </h1>
         <p class="hero-tagline">
-            **Неограниченное** пространство для **любых** файлов. Наша архитектура позволяет стримить **8K-контент** мгновенно и синхронизировать **миллионы мелких документов** без задержек. **Идеально для корпоративного сектора:** мгновенно делитесь рабочими протоколами и проводите безопасные презентации прямо во время бизнес-конференций.
+            Experience truly **limitless** storage for **any** file size. Our quantum architecture allows instant **8K streaming** and seamless synchronization of **millions of small documents**. Ideal for the enterprise sector: instantly share classified protocols and run secure presentations during high-stakes business conferences.
         </p>
     </div>
 
@@ -159,21 +159,21 @@
 
         <form id="loginForm">
             <div class="input-group">
-                <input type="email" placeholder="Access ID (Email)" required>
+                <input type="email" placeholder="Access ID (Corporate Email)" required>
             </div>
             <div class="input-group">
                 <input type="password" placeholder="Encryption Key (Password)" required>
             </div>
             
             <button type="submit" class="btn-login" id="submitBtn">
-                <span id="btnText">Connect to Server</span>
+                <span id="btnText">Initiate Connection</span>
                 <span id="loader" class="loader hidden"></span>
             </button>
         </form>
 
         <div class="footer-links">
             <a id="forgotLink">Forgot Key?</a>
-            <a id="requestLink">Request Access</a>
+            <a id="requestLink">Request Enterprise Access</a>
         </div>
     </div>
 
@@ -206,7 +206,7 @@
     </div>
 
     <script>
-        // --- Логика основного входа ---
+        // --- Main Login Logic ---
         const form = document.getElementById('loginForm');
         const btn = document.getElementById('submitBtn');
         const btnText = document.getElementById('btnText');
@@ -219,14 +219,14 @@
             btn.style.opacity = "0.7";
             
             setTimeout(() => {
-                btnText.innerText = "Access Denied";
+                btnText.innerText = "Access Denied"; // Simulated response
                 btnText.classList.remove('hidden');
                 loader.classList.add('hidden');
                 btn.style.background = "linear-gradient(90deg, #ff0076, #ff4d4d)";
                 btn.style.boxShadow = "0 5px 15px rgba(255, 0, 118, 0.4)";
                 
                 setTimeout(() => {
-                    btnText.innerText = "Connect to Server";
+                    btnText.innerText = "Initiate Connection";
                     btn.style.background = "linear-gradient(90deg, #00eaff, #0076ff)";
                     btn.style.boxShadow = "0 5px 15px rgba(0, 234, 255, 0.4)";
                     btn.style.opacity = "1";
@@ -235,7 +235,7 @@
             }, 1500);
         });
 
-        // --- Логика Модальных окон ---
+        // --- Modal Logic ---
         const modal = document.getElementById('modalOverlay');
         const modalTitle = document.getElementById('modalTitle');
         const modalDesc = document.getElementById('modalDesc');
@@ -245,23 +245,23 @@
         const modalLoader = document.getElementById('modalLoader');
         const modalEmail = document.getElementById('modalEmail');
 
-        // Открытие "Forgot Key"
+        // Open "Forgot Key"
         document.getElementById('forgotLink').addEventListener('click', () => {
-            modalTitle.innerText = "Encryption Key Recovery";
+            modalTitle.innerText = "Encryption Key Recovery Protocol";
             modalDesc.innerText = "Enter your registered ID to receive a one-time decryption token.";
             modalBtnText.innerText = "Send Token";
             modal.classList.add('active');
         });
 
-        // Открытие "Request Access"
+        // Open "Request Access"
         document.getElementById('requestLink').addEventListener('click', () => {
-            modalTitle.innerText = "Request Invitation";
-            modalDesc.innerText = "This node is private. Enter your email to queue for an invitation slot.";
+            modalTitle.innerText = "Request Enterprise Invitation";
+            modalDesc.innerText = "This node is private. Enter your corporate email to queue for an invitation slot.";
             modalBtnText.innerText = "Join Queue";
             modal.classList.add('active');
         });
 
-        // Закрытие модального окна
+        // Close Modal
         const closeModal = () => {
             modal.classList.remove('active');
             setTimeout(() => {
@@ -274,7 +274,7 @@
 
         document.getElementById('closeModal').addEventListener('click', closeModal);
 
-        // Имитация отправки в модальном окне
+        // Simulated Modal Form Submission
         modalForm.addEventListener('submit', (e) => {
             e.preventDefault();
             
@@ -283,15 +283,15 @@
             modalBtn.style.opacity = "0.7";
             
             setTimeout(() => {
-                // Успешная "отправка"
+                // Successful "Send"
                 modalLoader.classList.add('hidden');
                 modalBtnText.classList.remove('hidden');
-                modalBtnText.innerText = "Link Sent!";
-                modalBtn.style.background = "#00d26a"; // Зеленый цвет успеха
+                modalBtnText.innerText = "Link Sent!"; // Simulated success message
+                modalBtn.style.background = "#00d26a"; 
                 modalBtn.style.boxShadow = "0 0 15px rgba(0, 210, 106, 0.5)";
                 modalBtn.disabled = true;
 
-                // Закрытие через 1.5 секунды после успеха
+                // Close after delay
                 setTimeout(() => {
                     closeModal();
                 }, 1500);
@@ -299,7 +299,7 @@
             }, 1200);
         });
 
-        // Закрытие при клике вне окна
+        // Close when clicking outside modal
         modal.addEventListener('click', (e) => {
             if (e.target === modal) closeModal();
         });
