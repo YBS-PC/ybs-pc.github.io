@@ -3,17 +3,16 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>CloudX — современный файлообменник (заглушка) — с Lottie & SVG анимациями</title>
-<meta name="description" content="Демонстрационная заглушка файлообменника с анимированными SVG элементами и местом под Lottie.">
-<!-- Стили -->
+<title>CloudX — современный файлообменник (заглушка)</title>
+<meta name="description" content="Демонстрационная заглушка современного файлообменника — интерфейс, прогресс, список файлов и публичные ссылки.">
+<!-- Стили: современный минимализм, CSS-переменные, адаптивность -->
 <style>
   :root{
-    --bg: #071021;
-    --card: rgba(255,255,255,0.03);
+    --bg: #0f1720;
+    --card: #0f1728;
     --muted: #9aa4b2;
-    --accent-1: #7c5cff;
-    --accent-2: #00d4ff;
-    --glass: rgba(255,255,255,0.03);
+    --accent: #7c5cff;
+    --glass: rgba(255,255,255,0.04);
     --success: #22c55e;
     --danger: #ff6b6b;
     --radius: 12px;
@@ -21,260 +20,154 @@
     color-scheme: dark;
     font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   }
+  /* Лёгкая светлая тема через data-theme */
   :root[data-theme="light"]{
-    --bg: linear-gradient(180deg,#f6f8fb,#eef4ff);
+    --bg: #f6f8fb;
     --card: #ffffff;
-    --muted:#475569;
-    --accent-1:#4f46e5;
-    --accent-2:#06b6d4;
+    --muted: #556070;
+    --accent: #4f46e5;
+    --glass: rgba(0,0,0,0.04);
+    --success: #16a34a;
+    --danger: #dc2626;
     color-scheme: light;
   }
 
-  html,body{height:100%;margin:0;background:var(--bg);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;color:#e6eef8;}
-  .container{max-width:1200px;margin:28px auto;padding:18px;display:grid;grid-template-columns:1fr 380px;gap:22px;position:relative}
-  header{display:flex;align-items:center;gap:14px;margin-bottom:8px;z-index:5}
-  .logo-wrap{display:flex;align-items:center;gap:12px}
-  .logo-box{width:54px;height:54px;border-radius:12px;background:linear-gradient(135deg,var(--accent-1),var(--accent-2));display:flex;align-items:center;justify-content:center;box-shadow:0 8px 30px rgba(12,20,40,0.6);position:relative;overflow:visible}
-  .brand h1{font-size:1.05rem;margin:0;color: #eaf2ff}
-  .brand .subtitle{font-size:0.86rem;color:var(--muted);margin-top:4px}
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#08101a);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+  .app{max-width:1200px;margin:32px auto;padding:24px;display:grid;grid-template-columns:1fr 380px;gap:24px;}
+  header{display:flex;align-items:center;gap:16px;margin-bottom:14px;}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:48px;height:48px;background:linear-gradient(135deg,var(--accent),#00d4ff);border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;}
+  h1{font-size:1.1rem;margin:0;color:var(--muted);opacity:0.95}
+  .hero{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:var(--ui-padding);border-radius:var(--radius);backdrop-filter: blur(6px);box-shadow: 0 6px 30px rgba(2,6,23,0.6);}
 
-  /* animated background layer (SVG blobs) */
-  .bg-anim{position:fixed;left:50%;top:10%;transform:translateX(-50%);width:1400px;height:700px;pointer-events:none;filter:blur(40px);opacity:0.65;mix-blend-mode:screen;z-index:0}
+  /* Upload area */
+  .upload-area{display:flex;flex-direction:column;gap:14px;}
+  .dropzone{border:1px dashed rgba(255,255,255,0.06);padding:22px;border-radius:10px;display:flex;align-items:center;gap:16px;cursor:pointer;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.01));transition:all .18s}
+  .dropzone:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(2,6,23,0.5)}
+  .dz-left{display:flex;flex-direction:column;gap:6px}
+  .dz-title{font-weight:600;color:white}
+  .dz-sub{color:var(--muted);font-size:0.9rem}
+  .dz-btn{padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,var(--accent),#00d4ff);color:white;border:none;cursor:pointer;font-weight:600}
+  input[type=file]{display:none}
 
-  main.app{display:grid;grid-template-columns:1fr 380px;gap:22px;position:relative;z-index:3}
-  .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); padding:18px;border-radius:14px;backdrop-filter: blur(8px);box-shadow:0 10px 40px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.03)}
-  .hero{padding:var(--ui-padding);border-radius:var(--radius);min-height:460px}
+  /* Fake progress list */
+  .uploads{margin-top:8px;display:flex;flex-direction:column;gap:10px}
+  .upload-item{background:var(--card);border-radius:10px;padding:10px;display:flex;align-items:center;gap:12px;box-shadow:0 6px 16px rgba(2,6,23,0.35)}
+  .u-main{flex:1}
+  .filename{font-weight:600;color:white}
+  .filesize{color:var(--muted);font-size:0.85rem}
+  .bar-wrap{height:8px;background:var(--glass);border-radius:8px;margin-top:8px;overflow:hidden}
+  .bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),#00d4ff);transition:width .3s ease}
 
-  /* Dropzone с SVG-волной и lottie placeholder */
-  .dropzone{display:flex;align-items:center;gap:16px;padding:18px;border-radius:12px;border:1px dashed rgba(255,255,255,0.06);cursor:pointer;background:linear-gradient(90deg, rgba(255,255,255,0.01), transparent);transition:transform .18s}
-  .dropzone:hover{transform:translateY(-3px)}
-  .dz-left{display:flex;flex-direction:column}
-  .dz-title{font-weight:700;color:#fff}
-  .dz-sub{color:var(--muted);font-size:0.92rem}
-  .dz-actions{margin-left:auto;display:flex;gap:10px;align-items:center}
-  .dz-btn{padding:10px 14px;border-radius:10px;background:linear-gradient(90deg,var(--accent-1),var(--accent-2));color:white;border:none;cursor:pointer;font-weight:700;box-shadow:0 6px 18px rgba(12,8,40,0.45)}
-
-  /* animated "lottie area" inside dropzone - если есть lottie, он вставится сюда */
-  .lottie-stage{width:110px;height:110px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-
-  /* uploads list + shimmer */
-  .uploads{margin-top:12px;display:flex;flex-direction:column;gap:12px}
-  .upload-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;background:var(--card);overflow:hidden;position:relative}
-  .upload-item .file-meta{flex:1}
-  .filename{font-weight:700;color:#fff}
-  .filesize{color:var(--muted);font-size:0.88rem}
-  .bar-wrap{height:8px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:8px;margin-top:8px;overflow:hidden}
-  .bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent-1),var(--accent-2));transition:width .28s ease}
-
-  /* cards grid с shimmer-анимацией */
+  /* Files grid */
   .files{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px}
-  .file-card{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);border-radius:12px;padding:12px;display:flex;gap:12px;align-items:center;position:relative;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.5)}
-  .file-card::after{
-    content:'';position:absolute;left:-120%;top:0;width:60%;height:100%;background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.06), rgba(255,255,255,0));transform:skewX(-18deg);animation:shimmer 2.4s infinite;
-  }
-  @keyframes shimmer{0%{left:-120%}50%{left:120%}100%{left:120%}}
-
-  .thumb{width:64px;height:64px;border-radius:10px;background:linear-gradient(135deg,#0b1220,#071021);display:flex;align-items:center;justify-content:center;color:var(--muted);font-weight:800;flex-shrink:0;transform-origin:center;transition:transform .22s}
-  .file-card:hover .thumb{transform:translateY(-6px) scale(1.04)}
-  .meta .title{font-weight:800;color:#fff}
-  .meta .meta-line{color:var(--muted);font-size:0.86rem;margin-top:6px}
+  .file-card{background:var(--card);border-radius:12px;padding:12px;display:flex;gap:12px;align-items:center}
+  .thumb{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,#111827,#0f1728);display:flex;align-items:center;justify-content:center;color:var(--muted);font-weight:700}
+  .meta{flex:1}
+  .meta .title{font-weight:700;color:white}
+  .meta .meta-line{color:var(--muted);font-size:0.85rem;margin-top:6px}
   .actions{display:flex;gap:8px}
-  .btn{padding:8px 10px;border-radius:9px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);cursor:pointer;font-weight:700}
-  .btn.primary{background:linear-gradient(90deg,var(--accent-1),var(--accent-2));color:white;border:none}
+  .btn{padding:8px 10px;border-radius:9px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);cursor:pointer;font-weight:600}
+  .btn.primary{background:linear-gradient(90deg,var(--accent),#00d4ff);color:white;border:none}
 
-  /* Тосты */
-  .toast{position:fixed;right:20px;bottom:20px;display:flex;flex-direction:column;gap:10px;z-index:2000}
-  .toast-item{background:#061021;color:white;padding:12px;border-radius:10px;box-shadow:0 6px 20px rgba(2,6,23,0.6)}
+  /* Sidebar */
+  aside{position:relative}
+  .panel{background:var(--card);padding:18px;border-radius:12px;display:flex;flex-direction:column;gap:12px}
+  .stat{display:flex;gap:12px;align-items:center}
+  .stat .num{font-size:1.4rem;font-weight:800;color:white}
+  .small{color:var(--muted);font-size:0.9rem}
+  .search{display:flex;gap:8px;align-items:center}
+  .search input{flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:white}
+  .tiny{font-size:0.85rem;color:var(--muted)}
 
-  /* small responsive */
-  @media (max-width:980px){.container{grid-template-columns:1fr;padding:14px}.files{grid-template-columns:1fr}aside{order:-1}}
+  /* Notifications */
+  .toast{position:fixed;right:20px;bottom:20px;display:flex;flex-direction:column;gap:10px;z-index:1000}
+  .toast-item{background:#0b1220;color:white;padding:12px;border-radius:10px;box-shadow:0 6px 20px rgba(2,6,23,0.6)}
+
+  /* Responsive */
+  @media (max-width:980px){.app{grid-template-columns:1fr;padding:16px}.files{grid-template-columns:1fr}aside{order:-1}}
 </style>
 </head>
 <body>
-  <!-- SVG ANIMATED BACKGROUND: плавные blob-формы (вектор + анимация transform) -->
-  <svg class="bg-anim" viewBox="0 0 1400 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-    <defs>
-      <linearGradient id="g1" x1="0" x2="1">
-        <stop offset="0" stop-color="#7c5cff" stop-opacity="0.9"/>
-        <stop offset="1" stop-color="#00d4ff" stop-opacity="0.9"/>
-      </linearGradient>
-      <filter id="softBlur" x="-20%" y="-20%" width="140%" height="140%">
-        <feGaussianBlur stdDeviation="60" result="b"/>
-        <feColorMatrix type="matrix" values="1 0 0 0 0
-                                             0 1 0 0 0
-                                             0 0 1 0 0
-                                             0 0 0 0.6 0" />
-      </filter>
-    </defs>
-
-    <!-- Большой blob -->
-    <g filter="url(#softBlur)">
-      <path id="blob1" fill="url(#g1)" d="M300 80C420 10 700 -20 980 60C1260 140 1240 420 1000 540C760 660 420 620 220 520C20 420 180 150 300 80Z" opacity="0.85">
-        <animate attributeName="d" dur="18s" repeatCount="indefinite"
-          values="
-            M300 80C420 10 700 -20 980 60C1260 140 1240 420 1000 540C760 660 420 620 220 520C20 420 180 150 300 80Z;
-            M260 120C420 20 760 -10 980 140C1200 290 1160 460 980 560C800 660 460 620 260 520C60 420 120 170 260 120Z;
-            M320 30C480 10 720 -40 1060 40C1400 120 1320 420 1040 540C760 660 420 620 220 520C80 420 120 130 320 30Z;
-            M300 80C420 10 700 -20 980 60C1260 140 1240 420 1000 540C760 660 420 620 220 520C20 420 180 150 300 80Z
-          " />
-      </path>
-    </g>
-
-    <!-- Малые шарики -->
-    <g filter="url(#softBlur)" opacity="0.55">
-      <circle cx="1100" cy="120" r="90" fill="#00e0ff">
-        <animate attributeName="cx" dur="12s" values="1100;980;1140;1100" repeatCount="indefinite"/>
-        <animate attributeName="cy" dur="14s" values="120;80;140;120" repeatCount="indefinite"/>
-      </circle>
-      <circle cx="160" cy="520" r="60" fill="#7c5cff">
-        <animate attributeName="cx" dur="16s" values="160;220;120;160" repeatCount="indefinite"/>
-        <animate attributeName="cy" dur="10s" values="520;480;540;520" repeatCount="indefinite"/>
-      </circle>
-    </g>
-  </svg>
-
-  <div class="container" role="main">
-    <!-- Header -->
-    <header style="width:100%;z-index:5">
-      <div class="logo-wrap">
-        <!-- ANIMATED SVG LOGO: path stroke + glow -->
-        <div class="logo-box" aria-hidden="true">
-          <svg width="44" height="44" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
-            <defs>
-              <linearGradient id="lg" x1="0" x2="1">
-                <stop offset="0" stop-color="#fff" stop-opacity="0.95"/>
-                <stop offset="1" stop-color="#fff" stop-opacity="0.5"/>
-              </linearGradient>
-              <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="6" result="blur" />
-                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-              </filter>
-            </defs>
-            <!-- круг + буквы CX -->
-            <g transform="translate(10,10)">
-              <circle cx="30" cy="30" r="28" fill="url(#lg)" opacity="0.07" />
-              <path d="M14 40 L28 18 L42 40 Z" fill="#fff" opacity="0.15">
-                <animate attributeName="opacity" dur="2.4s" values="0.08;0.22;0.08" repeatCount="indefinite"/>
-                <animateTransform attributeName="transform" type="translate" values="0 0; 0 -4; 0 0" dur="2.4s" repeatCount="indefinite"/>
-              </path>
-              <text x="30" y="42" text-anchor="middle" font-weight="800" font-size="22" fill="white" style="font-family:Inter, sans-serif">CX</text>
-            </g>
-          </svg>
-        </div>
-
-        <div class="brand">
-          <h1>CloudX — демонстрационная заглушка</h1>
-          <div class="subtitle">Интерфейс с Lottie & SVG-анимациями — локальная демоверсия</div>
-        </div>
+  <div style="max-width:1200px;margin:20px auto;padding:12px;">
+    <!-- Заголовок и бренд -->
+    <header class="brand">
+      <div class="logo" aria-hidden="true">CX</div>
+      <div>
+        <h1>CloudX — демонстрационная заглушка</h1>
+        <div class="tiny">Интерфейс: загрузка, список, ссылки — всё локально и безопасно</div>
       </div>
     </header>
 
-    <!-- Основной контент -->
     <main class="app">
-      <!-- Левый столбец -->
-      <section class="panel hero" aria-labelledby="main-title">
-        <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
-          <div style="flex:1">
-            <div id="main-title" style="font-weight:800;font-size:1.05rem;color:#fff">Загрузите файлы</div>
-            <div class="tiny" style="color:var(--muted);margin-top:6px">Поддерживаются любые форматы. В этой демо-версии файлы остаются в браузере.</div>
+      <!-- Левый основной блок -->
+      <section class="hero">
+        <div class="upload-area">
+          <!-- Область перетаскивания -->
+          <label class="dropzone" id="dropzone" tabindex="0" aria-label="Загрузить файлы">
+            <div class="dz-left">
+              <div class="dz-title">Перетащите файлы сюда или нажмите «Выбрать»</div>
+              <div class="dz-sub">Поддерживаются любые форматы. Для этой демо-страницы файлы не отправляются.</div>
+            </div>
+            <div style="margin-left:auto">
+              <input id="fileInput" type="file" multiple>
+              <button class="dz-btn" id="chooseBtn" type="button">Выбрать</button>
+            </div>
+          </label>
+
+          <!-- Активные "загрузки" (симуляция) -->
+          <div class="uploads" id="uploads"></div>
+
+          <!-- Раздел с файлами (фиктивная библиотека) -->
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+            <div class="tiny">Последние файлы</div>
+            <div class="tiny" id="countText">0 файлов</div>
           </div>
-          <!-- Небольшая Lottie-иконка (по желанию) -->
-          <div style="width:96px;height:96px;display:flex;align-items:center;justify-content:center;">
-            <!-- Здесь можно загрузить Lottie: см. комментарий внизу JS -->
-            <div id="miniLottie" style="width:86px;height:86px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent)"></div>
-          </div>
+
+          <div class="files" id="filesGrid" aria-live="polite"></div>
         </div>
-
-        <!-- Dropzone с SVG-волной и местом под Lottie -->
-        <label class="dropzone" id="dropzone" tabindex="0" aria-label="Загрузить файлы">
-          <div class="dz-left">
-            <div class="dz-title">Перетащите файлы сюда или нажмите «Выбрать»</div>
-            <div class="dz-sub">Поддерживаются любые форматы — в демо файлы не отправляются.</div>
-            <!-- динамический статус -->
-            <div id="dropStatus" style="margin-top:8px;color:var(--muted);font-size:0.9rem">Готово к загрузке</div>
-          </div>
-
-          <!-- ЛЕВАЯ зона: Lottie + SVG-wave -->
-          <div class="lottie-stage" aria-hidden="true">
-            <!-- SVG волна -->
-            <svg width="110" height="110" viewBox="0 0 110 110" preserveAspectRatio="xMidYMid meet">
-              <defs>
-                <linearGradient id="waveg" x1="0" x2="1">
-                  <stop offset="0" stop-color="#7c5cff"/>
-                  <stop offset="1" stop-color="#00d4ff"/>
-                </linearGradient>
-              </defs>
-              <g transform="translate(55,55)">
-                <path id="wavePath" d="M-45,0 C-20,-30 20,-30 45,0 C20,30 -20,30 -45,0 Z" fill="url(#waveg)" opacity="0.85">
-                  <animateTransform attributeName="transform" attributeType="XML" type="rotate" dur="6s" values="0;6;0;-6;0" repeatCount="indefinite"/>
-                  <animate attributeName="d" dur="8s" repeatCount="indefinite"
-                    values="
-                      M-45,0 C-20,-30 20,-30 45,0 C20,30 -20,30 -45,0 Z;
-                      M-45,0 C-25,-20 25,-40 45,0 C25,40 -25,20 -45,0 Z;
-                      M-45,0 C-15,-40 15,-20 45,0 C15,20 -15,40 -45,0 Z;
-                      M-45,0 C-20,-30 20,-30 45,0 C20,30 -20,30 -45,0 Z
-                    " />
-                </path>
-              </g>
-            </svg>
-          </div>
-
-          <!-- Правее кнопки -->
-          <div class="dz-actions" style="margin-left:auto">
-            <input id="fileInput" type="file" multiple style="display:none">
-            <button id="chooseBtn" class="dz-btn" type="button">Выбрать</button>
-          </div>
-        </label>
-
-        <!-- Активные "загрузки" -->
-        <div class="uploads" id="uploads"></div>
-
-        <!-- Сетка файлов -->
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
-          <div style="color:var(--muted)">Последние файлы</div>
-          <div id="countText" style="color:var(--muted)">0 файлов</div>
-        </div>
-
-        <div class="files" id="filesGrid" aria-live="polite"></div>
       </section>
 
       <!-- Правая панель -->
-      <aside class="panel" aria-label="Панель управления">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div style="color:var(--muted)">Статистика</div>
-            <div style="display:flex;gap:12px;align-items:baseline">
-              <div style="font-size:1.6rem;font-weight:900" id="statFiles">0</div>
-              <div style="color:var(--muted)">файлов</div>
+      <aside>
+        <div class="panel">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div class="small">Статистика (симуляция)</div>
+              <div class="stat"><div class="num" id="statFiles">0</div><div class="small">файлов</div></div>
+            </div>
+            <div style="text-align:right">
+              <div class="small">Тема</div>
+              <select id="themeSwitch" aria-label="Выбор темы" style="padding:6px;border-radius:8px;background:transparent;color:var(--muted)">
+                <option value="dark">Тёмная</option>
+                <option value="light">Светлая</option>
+              </select>
             </div>
           </div>
+
           <div>
-            <div style="color:var(--muted);font-size:0.9rem;margin-bottom:6px">Тема</div>
-            <select id="themeSwitch" aria-label="Выбор темы" style="padding:8px;border-radius:8px;background:transparent;color:var(--muted)">
-              <option value="dark">Тёмная</option>
-              <option value="light">Светлая</option>
-            </select>
+            <div class="small">Поиск</div>
+            <div class="search">
+              <input id="searchInput" placeholder="По названию или расширению..." />
+              <button class="btn" id="clearSearch">Сброс</button>
+            </div>
           </div>
-        </div>
 
-        <div style="margin-top:10px">
-          <div style="color:var(--muted);margin-bottom:6px">Поиск</div>
-          <div style="display:flex;gap:8px">
-            <input id="searchInput" placeholder="По названию или расширению..." style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#fff"/>
-            <button class="btn" id="clearSearch">Сброс</button>
+          <div>
+            <div class="small">Поделиться (демо)</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn" id="publicLinkBtn">Создать ссылку</button>
+              <button class="btn" id="resetBtn">Очистить</button>
+            </div>
+            <div id="linkArea" class="tiny" style="margin-top:8px;color:var(--muted)"></div>
           </div>
-        </div>
 
-        <div style="margin-top:12px">
-          <div style="display:flex;gap:8px">
-            <button class="btn" id="publicLinkBtn">Создать ссылку</button>
-            <button class="btn" id="resetBtn">Очистить</button>
+          <div style="margin-top:6px">
+            <div class="small">Описание</div>
+            <div class="tiny" style="color:var(--muted)">
+              Эта страница — визуальная демоверсия интерфейса обмена файлами. Никакие данные не покидают ваш браузер.
+            </div>
           </div>
-          <div id="linkArea" style="color:var(--muted);margin-top:8px;font-size:0.9rem"></div>
-        </div>
-
-        <div style="margin-top:12px;color:var(--muted);font-size:0.9rem">
-          Эта страница — визуальная демонстрация. Никакие файлы не отправляются на сервер — всё хранится в памяти браузера.
         </div>
       </aside>
     </main>
@@ -283,18 +176,15 @@
   <!-- Тосты -->
   <div class="toast" id="toasts" aria-live="polite" aria-atomic="true"></div>
 
-  <!-- Lottie player CDN (готов к использованию, но анимация JSON нужно подставить) -->
-  <script src="https://unpkg.com/lottie-web@latest/build/lottie.min.js"></script>
-
 <script>
 /*
-  enhanced-demo.js
-  Логика: симуляция загрузки, рендер карточек + подключение Lottie (если анимация задана).
-  Комментарии на русском, готово к подстановке Lottie JSON/URL.
+  demo-file-exchange.js
+  Полная логика симуляции: выбор файлов, "загрузка" с прогрессом, создание фейковой публичной ссылки,
+  управление списком, поиск и очистка. Всё в одном файле для простоты.
 */
 
 (function(){
-  // DOM
+  // DOM элементы
   const dropzone = document.getElementById('dropzone');
   const fileInput = document.getElementById('fileInput');
   const chooseBtn = document.getElementById('chooseBtn');
@@ -309,12 +199,11 @@
   const resetBtn = document.getElementById('resetBtn');
   const toasts = document.getElementById('toasts');
   const themeSwitch = document.getElementById('themeSwitch');
-  const dropStatus = document.getElementById('dropStatus');
 
-  // В памяти демонстрационные файлы
+  // Хранилище фиктивных файлов (в памяти)
   let files = [];
 
-  // Форматирование размера
+  // Небольшая утилита для форматирования размера
   function formatBytes(bytes){
     if(bytes === 0) return '0 B';
     const k = 1024;
@@ -323,16 +212,18 @@
     return parseFloat((bytes / Math.pow(k,i)).toFixed(2)) + ' ' + sizes[i];
   }
 
-  // Простая утилита id
+  // Генерируем фейковый ID и фейковую публичную ссылку
   function makeId(len=8){
     const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
     let s = '';
     for(let i=0;i<len;i++) s += chars[Math.floor(Math.random()*chars.length)];
     return s;
   }
-  function makeFakeLink(id){ return `https://cloudx.example/share/${id}`; }
+  function makeFakeLink(id){
+    return `https://cloudx.example/share/${id}`;
+  }
 
-  // Тосты
+  // Отображение тоста
   function toast(text){
     const el = document.createElement('div');
     el.className = 'toast-item';
@@ -342,17 +233,22 @@
     setTimeout(()=> el.remove(), 3800);
   }
 
-  // Добавляем файл в библиотеку
+  // Добавить "файл" в библиотеку (после симуляции загрузки)
   function addFile({name,size,type,thumb}){
     const id = makeId(10);
-    const f = { id, name, size, type, thumb: thumb || null, createdAt: new Date().toISOString(), downloads: Math.floor(Math.random()*2400) };
+    const f = {
+      id, name, size, type, thumb: thumb || null,
+      createdAt: new Date().toISOString(),
+      downloads: Math.floor(Math.random()*2400)
+    };
     files.unshift(f);
     renderFiles();
     toast(`Файл «${name}» готов.`);
   }
 
-  // Рендер списка файлов с поиском
+  // Рендер карточек файлов
   function renderFiles(filter=''){
+    // простой поиск по имени/расширению
     const q = filter.trim().toLowerCase();
     const list = files.filter(f => !q || f.name.toLowerCase().includes(q));
     filesGrid.innerHTML = '';
@@ -374,39 +270,52 @@
     });
     statFiles.textContent = files.length;
     countText.textContent = `${files.length} файлов`;
-    filesGrid.querySelectorAll('button').forEach(btn=> btn.addEventListener('click', onCardAction));
+    // подключаем обработчики для кнопок внутри карточек
+    filesGrid.querySelectorAll('button').forEach(btn=>{
+      btn.addEventListener('click', onCardAction);
+    });
   }
 
+  // Получаем заглавные буквы для превью
   function getThumbText(name){
     const parts = name.split('.');
     const main = parts[0] || name;
     return main.slice(0,2).toUpperCase();
   }
+
+  // Экранируем HTML в текст
   function escapeHtml(s){ return s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
-  // Действия в карточке
+  // Обработчик кнопок в карточках
   function onCardAction(e){
     const id = e.currentTarget.dataset.id;
     const action = e.currentTarget.dataset.action;
     const f = files.find(x=>x.id===id);
     if(!f) return;
     if(action === 'download'){
+      // В демо — показываем модал или тост с ссылкой
       const link = makeFakeLink(id);
       toast(`Ссылка для скачивания: ${link}`);
+      // имитация увеличения счётчика скачиваний
       f.downloads += 1;
     } else if(action === 'copy'){
       const link = makeFakeLink(id);
-      navigator.clipboard?.writeText(link).then(()=> toast('Ссылка скопирована в буфер обмена')).catch(()=> toast('Не удалось скопировать — скопируйте вручную: ' + link));
+      navigator.clipboard?.writeText(link).then(()=> {
+        toast('Ссылка скопирована в буфер обмена');
+      }).catch(()=> {
+        toast('Не удалось скопировать ссылку — скопируйте вручную: ' + link);
+      });
     }
   }
 
-  // Симуляция загрузки: прогресс + добавление в библиотеку
+  // Симулированная "загрузка" файлов: создаём прогресс элемент и плавно увеличиваем значение
   function simulateUpload(selectedFiles){
     Array.from(selectedFiles).forEach(file=>{
+      // Создаём визуальную карточку загрузки
       const item = document.createElement('div');
       item.className = 'upload-item';
       item.innerHTML = `
-        <div class="file-meta">
+        <div class="u-main">
           <div class="filename">${escapeHtml(file.name)}</div>
           <div class="filesize">${formatBytes(file.size)}</div>
           <div class="bar-wrap"><div class="bar"></div></div>
@@ -416,16 +325,22 @@
         </div>
       `;
       uploads.prepend(item);
+
       const bar = item.querySelector('.bar');
       const pct = item.querySelector('.tiny');
+
+      // Имитация прогресса: скорость зависит от файла
       let progress = 0;
-      const speedFactor = Math.max(10, Math.min(1200, file.size / 1024));
+      const speedFactor = Math.max(10, Math.min(1200, file.size / 1024)); // юниты для вариации
       const interval = setInterval(()=>{
+        // прогресс растёт нелинейно
         progress += Math.random() * (1 + 1000 / speedFactor);
         if(progress >= 100){
           progress = 100;
           clearInterval(interval);
+          // добавляем в библиотеку (без реального контента)
           addFile({name: file.name, size: file.size, type: file.type});
+          // удаляем элемент прогресса через 600ms
           setTimeout(()=> item.remove(), 600);
         }
         bar.style.width = progress + '%';
@@ -434,46 +349,58 @@
     });
   }
 
-  // Обработчики выбора/дропа
+  // Обработчики выбора/перетаскивания
   chooseBtn.addEventListener('click', ()=> fileInput.click());
-  fileInput.addEventListener('change', (e)=> { simulateUpload(e.target.files); e.target.value = ''; });
-
-  ['dragenter','dragover','dragleave','drop'].forEach(ev=>{
-    dropzone.addEventListener(ev, (e)=>{ e.preventDefault(); e.stopPropagation(); });
+  fileInput.addEventListener('change', (e)=> {
+    simulateUpload(e.target.files);
+    // обнуляем input чтобы можно было выбрать те же файлы снова
+    e.target.value = '';
   });
-  dropzone.addEventListener('dragenter', ()=> { dropzone.style.transform = 'translateY(-4px) scale(1.01)'; dropStatus.textContent = 'Отпустите для загрузки'; });
-  dropzone.addEventListener('dragleave', ()=> { dropzone.style.transform = ''; dropStatus.textContent = 'Готово к загрузке'; });
+
+  // Драг-н-дроп
+  ['dragenter','dragover','dragleave','drop'].forEach(ev=>{
+    dropzone.addEventListener(ev, (e)=>{
+      e.preventDefault();
+      e.stopPropagation();
+    });
+  });
   dropzone.addEventListener('drop', (e)=>{
-    dropzone.style.transform = '';
-    dropStatus.textContent = 'Файлы приняты';
     const dt = e.dataTransfer;
     if(dt && dt.files && dt.files.length) simulateUpload(dt.files);
-    setTimeout(()=> dropStatus.textContent = 'Готово к загрузке', 1100);
   });
 
-  // Поиск и кнопки
+  // Поиск
   searchInput.addEventListener('input', ()=> renderFiles(searchInput.value));
-  clearSearch.addEventListener('click', ()=> { searchInput.value=''; renderFiles(''); });
+  clearSearch.addEventListener('click', ()=> {searchInput.value=''; renderFiles('');});
 
+  // Кнопка создания публичной ссылки (демо)
   publicLinkBtn.addEventListener('click', ()=>{
-    if(files.length === 0){ toast('Нет файлов для ссылки.'); return; }
+    if(files.length === 0){
+      toast('Нет файлов для ссылки.');
+      return;
+    }
     const sample = files.slice(0,3).map(f=>makeFakeLink(f.id)).join('\n');
     linkArea.textContent = sample;
     toast('Публичные ссылки созданы (демо).');
   });
 
+  // Сброс: очищаем демо-хранилище
   resetBtn.addEventListener('click', ()=>{
     if(confirm('Очистить все демонстрационные файлы? (это действие только для демо)')){
-      files = []; renderFiles(); linkArea.textContent=''; toast('Данные демо удалены.');
+      files = [];
+      renderFiles();
+      linkArea.textContent = '';
+      toast('Демонстрационные данные удалены.');
     }
   });
 
+  // Темы
   themeSwitch.addEventListener('change', (e) => {
     const v = e.target.value;
     document.documentElement.setAttribute('data-theme', v === 'light' ? 'light' : 'dark');
   });
 
-  // Инициализация: seed
+  // Инициализация: добавляем пару фиктивных файлов для примера
   (function seedDemo(){
     const sample = [
       {name:'product-roadmap.pdf', size: 2_048_000, type:'application/pdf'},
@@ -483,55 +410,13 @@
     sample.forEach(s=> addFile(s));
   })();
 
-  // Клавиатурная доступность dropzone
-  dropzone.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' || e.key === ' ') { fileInput.click(); e.preventDefault(); } });
+  // Помощь для доступности: клавиатурная активация dropzone
+  dropzone.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' || e.key === ' '){ fileInput.click(); e.preventDefault(); }
+  });
 
+  // Инициалный рендер
   renderFiles();
-
-  /* ---------------------------
-     LOTTIE: подготовка мини-анимации
-     - lottie-web подключён CDN'ом выше
-     - здесь показан пример: если у вас есть JSON-анимация (как объект) или URL,
-       вы можете подставить её в опции ниже.
-     - если JSON не задан, мини-область остаётся с SVG-волной (см. DOM).
-     --------------------------- */
-
-  // Вариант A: если у вас есть URL к lottie JSON — укажите его в lottieUrl.
-  // Вариант B: если у вас есть JS-объект lottieJson — укажите его в lottieJson.
-  // По умолчанию оба пусты (ниже — пример, как подставить).
-  const lottieUrl = ''; // пример: 'https://assets10.lottiefiles.com/packages/lf20_abcdefgh.json'
-  const lottieJson = null; // или подставьте объект JSON анимации
-
-  // Функция загрузки Lottie в контейнер #miniLottie
-  function loadMiniLottie(options){
-    try{
-      const container = document.getElementById('miniLottie');
-      if(!container) return;
-      // очищаем предыдущее
-      container.innerHTML = '';
-      // создаём контейнер для player
-      const w = document.createElement('div'); w.style.width='86px'; w.style.height='86px';
-      container.appendChild(w);
-      const params = { container: w, renderer: 'svg', loop: true, autoplay: true };
-      if(options.url) params.path = options.url;
-      if(options.json) params.animationData = options.json;
-      // eslint-disable-next-line no-undef
-      if(window.lottie) window.lottie.loadAnimation(params);
-      else {
-        // если lottie не загружен, оставим SVG-пульсацию (в DOM уже есть wave)
-      }
-    } catch(e){
-      console.warn('Lottie load failed', e);
-    }
-  }
-
-  // Если заданы — загружаем
-  if(lottieUrl) loadMiniLottie({url: lottieUrl});
-  else if(lottieJson) loadMiniLottie({json: lottieJson});
-  else {
-    // опционально можно вставить небольшую inline SVG-анимацию вместо lottie
-    // (в DOM уже есть анимированная волна в .lottie-stage)
-  }
 
 })();
 </script>
